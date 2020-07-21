@@ -16,6 +16,8 @@ parser.add_argument('input',
                     help="The text file you want to add noise to")
 parser.add_argument('--output', default=None,
                     help="Optional, the name you want to give to your output, default=yourfilename.noisy")
+parser.add_argument('--target', default=None,
+                    help="Optional, add targe input file to process monotone bitexts")
 parser.add_argument('--progress', action='store_true',
                     help="Optional, show the progress")
 parser.add_argument('--delete_probability', default=0.1, type=float,
@@ -31,16 +33,27 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     file_input = args.input
+    file_target = args.target
     file_output = file_input + ".noisy"
     if args.output:
         file_output = args.output
 
     lines_number = count_lines(file_input) if args.progress else None
 
-    with open(file_input, 'r') as corpus, open(file_output, 'w') as output:
-        # You can remove a noise function here, modify its parameters or add your own (writing it in noise_functions.py)
-        for line in tqdm(corpus, total=lines_number):
-            line = delete_random_token(line, probability=args.delete_probability)
-            line = replace_random_token(line, probability=args.replace_probability, filler_token=args.filler_token)
-            line = random_token_permutation(line, _range=args.permutation_range)
-            output.write(line + '\n')
+
+    if (file_target != None):
+        with open(file_input, 'r') as corpus, open(file_output, 'w') as output, open(file_target, 'r') as target_corpus:
+            # You can remove a noise function here, modify its parameters or add your own (writing it in noise_functions.py)
+            for line in tqdm(corpus, total=lines_number), line_tgt in target_corpus:
+                line, line_tgt = bi_delete_random_token(line, line_tgt, probability=args.delete_probability)
+                line, line_tgt = bi_replace_random_token(line, line_tgt, probability=args.replace_probability, filler_token=args.filler_token)
+                line, line_tgt = bi_random_token_permutation(line, line_tgt, _range=args.permutation_range)
+                output.write(line + '\t' + line_tgt'\n')
+    else:
+        with open(file_input, 'r') as corpus, open(file_output, 'w') as output:
+            # You can remove a noise function here, modify its parameters or add your own (writing it in noise_functions.py)
+            for line in tqdm(corpus, total=lines_number):
+                line = delete_random_token(line, probability=args.delete_probability)
+                line = replace_random_token(line, probability=args.replace_probability, filler_token=args.filler_token)
+                line = random_token_permutation(line, _range=args.permutation_range)
+                output.write(line + '\n')
