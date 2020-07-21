@@ -65,7 +65,9 @@ def bi_delete_random_token(line, line_tgt, probability):
         return "",""
     #ret = [token for token in line_split if not random_bool(probability)]
     for i in range(len(line_split)):
-        if not random_bool(probability):
+        if random_bool(probability):
+            if i < len(line_split)-1 and line_tgt_split[i].find("B-") > -1:
+                line_tgt_split[i+1] = line_tgt_split[i+1].replace("I-","B-")
             line_split[i] = ""
             line_tgt_split[i] = ""
     return (" ".join(line_split)).replace("  "," "), (" ".join(line_tgt_split)).replace("  "," ")
@@ -86,6 +88,8 @@ def bi_replace_random_token(line, line_tgt, probability, filler_token="BLANK"):
         return "",""
     for i in range(len(line_split)):
         if random_bool(probability):
+            if i < len(line_split)-1 and line_tgt_split[i].find("B-") > -1:
+                line_tgt_split[i+1] = line_tgt_split[i+1].replace("I-","B-")
             line_split[i] = filler_token
             line_tgt_split[i] = filler_token
     return " ".join(line_split),  " ".join(line_tgt_split)

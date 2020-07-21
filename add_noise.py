@@ -44,11 +44,12 @@ if __name__ == '__main__':
     if (file_target != None):
         with open(file_input, 'r') as corpus, open(file_output, 'w') as output, open(file_target, 'r') as target_corpus:
             # You can remove a noise function here, modify its parameters or add your own (writing it in noise_functions.py)
-            for line in tqdm(corpus, total=lines_number), line_tgt in target_corpus:
+            for line in tqdm(corpus, total=lines_number):
+                line_tgt = target_corpus.readline()
                 line, line_tgt = bi_delete_random_token(line, line_tgt, probability=args.delete_probability)
                 line, line_tgt = bi_replace_random_token(line, line_tgt, probability=args.replace_probability, filler_token=args.filler_token)
                 line, line_tgt = bi_random_token_permutation(line, line_tgt, _range=args.permutation_range)
-                output.write(line + '\t' + line_tgt'\n')
+                output.write(line + '\t' + line_tgt + '\n')
     else:
         with open(file_input, 'r') as corpus, open(file_output, 'w') as output:
             # You can remove a noise function here, modify its parameters or add your own (writing it in noise_functions.py)
